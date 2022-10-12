@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 engine = create_engine(
-    'postgresql+psycopg2://postgres:root@localhost/redis_db', connect_args={"check_same_thread": False}
+    'postgresql+psycopg2://postgres:root@localhost/postgers_db', connect_args={"check_same_thread": False}
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
