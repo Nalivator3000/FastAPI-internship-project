@@ -1,7 +1,7 @@
 FROM python
 
 COPY ./scr /app/scr
-COPY ./requirements.txt /app
+COPY requirements.txt /app
 
 WORKDIR /app
 
