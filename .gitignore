@@ -126,4 +126,4 @@ dmypy.json
 
 dump.rdb
 
-.env
+./.env
