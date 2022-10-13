@@ -4,7 +4,7 @@ services:
   app:
     build: .
     ports:
-      - "8000:8000"
+      - "${DOCKER_APP_PORT}:${DOCKER_APP_PORT}"
     volumes:
       - .:/data
 
@@ -12,7 +12,7 @@ services:
     image: redis
     restart: always
     ports:
-      - '6379:6379'
+      - '${DOCKER_REDIS_PORT}:${DOCKER_REDIS_PORT}'
     volumes:
       - .:/data
 
@@ -20,10 +20,10 @@ services:
     image: postgres
     restart: always
     ports:
-      - '5432:5432'
+      - '${DOCKER_POSTGRES_PORT}:${DOCKER_POSTGRES_PORT}'
     environment:
-      POSTGRES_PASSWORD: root
-      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
     volumes:
       - .:/data
 

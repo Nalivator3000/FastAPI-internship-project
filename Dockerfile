@@ -2,6 +2,7 @@ FROM python
 
 COPY ./scr /app/scr
 COPY requirements.txt /app
+COPY .env .env
 
 WORKDIR /app
 

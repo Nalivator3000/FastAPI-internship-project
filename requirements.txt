@@ -4,3 +4,4 @@ sqlalchemy
 aioredis
 databases
 asyncpg
+python-dotenv
