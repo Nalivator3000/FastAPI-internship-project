@@ -8,6 +8,6 @@ REDIS_HOST = os.getenv('REDIS_HOST')
 
 
 async def main():
-    redis = aioredis.from_url("redis://REDIS_HOST")
+    redis = aioredis.from_url(f"redis://{REDIS_HOST}")
     await redis.set("my-key", "value")
     value = await redis.get("my-key")
