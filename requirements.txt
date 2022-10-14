@@ -5,4 +5,4 @@ aioredis
 databases
 asyncpg
 python-dotenv
-aiosqlite
+alembic

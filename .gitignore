@@ -131,3 +131,7 @@ dump.rdb
 
 /env library root
 env library root
+
+alembic.ini
+
+/migrations
