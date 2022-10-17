@@ -1,8 +1,0 @@
-fastapi
-uvicorn
-sqlalchemy
-aioredis
-databases
-asyncpg
-python-dotenv
-alembic
