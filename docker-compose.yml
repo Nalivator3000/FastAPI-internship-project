@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.10"
 
 services:
 
@@ -12,8 +12,6 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
-
-
 
   pgadmin:
     container_name: pgadmin
@@ -37,4 +35,3 @@ services:
     depends_on:
       - db
     restart: always
-
