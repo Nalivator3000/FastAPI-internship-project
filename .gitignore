@@ -129,3 +129,5 @@ dump.rdb
 ./.env
 
 tutorial.md
+
+/scr/__pycache__
