@@ -1,7 +1,6 @@
 import datetime
 
 from pydantic import BaseModel
-from typing import List
 
 
 class UserDisplay(BaseModel):
@@ -11,6 +10,10 @@ class UserDisplay(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class UserDisplayWithId(UserDisplay):
+    id: int
 
 
 class SignUpRequestModel(UserDisplay):
