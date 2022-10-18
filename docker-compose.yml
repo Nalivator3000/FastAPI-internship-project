@@ -1,34 +1,17 @@
-version: '3'
+version: "3.10"
 
 services:
-  app:
-    build: .
-    container_name: app
-    ports:
-      - "${DOCKER_APP_PORT}"
-    volumes:
-      - .:/data
 
-  redis:
-    image: redis
-    restart: always
-    ports:
-      - '${DOCKER_REDIS_PORT}'
-    volumes:
-      - .:/data
-
-  postgres:
-    container_name: postgres
+  db:
+    container_name: postgresql_db
     image: postgres
     restart: always
     ports:
-      - '${DOCKER_POSTGRES_PORT}'
+      - ${POSTGRES_PORTS}
     environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_DB: ${POSTGRES_DB_NAME}
-    volumes:
-      - .:/data
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
 
   pgadmin:
     container_name: pgadmin
@@ -37,10 +20,18 @@ services:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
     ports:
-      - ${PGADMIN_PORTS}
+      - ${PG_ADMIN_PORTS}
     depends_on:
-      - postgres
+      - db
 
-volumes:
-  cache:
-    driver: local
+  app:
+    container_name: app
+    build: .
+    command: bash -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - .:/app
+    ports:
+      - ${APP_PORTS}
+    depends_on:
+      - db
+    restart: always

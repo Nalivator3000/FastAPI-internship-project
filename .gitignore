@@ -127,3 +127,9 @@ dmypy.json
 dump.rdb
 
 ./.env
+
+tutorial.md
+
+/scr/__pycache__
+
+/app/__pycache__/

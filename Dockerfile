@@ -1,13 +1,8 @@
-FROM python
-
-COPY ./scr /app/scr
-COPY requirements.txt /app
-COPY .env .env
-
+FROM python:3
+ENV PYTHONUNBUFFERED=1
 WORKDIR /app
-
-RUN pip install -r requirements.txt
-
+COPY requirements.txt requirements.txt
+RUN pip3 install --upgrade pip
+RUN pip3 install -r requirements.txt
+COPY . /app
 EXPOSE 8000
-
-CMD ["uvicorn", "scr.main:app", "--host=0.0.0.0", "--port", "8000", "--reload"]

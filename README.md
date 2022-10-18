@@ -7,3 +7,7 @@
       - OR
    - docker-compose up
    - Open localhost (http://127.0.0.1:8000)
+
+2. To migrate models enter:
+    - docker-compose run app alembic revision --autogenerate -m "New Migration"
+    - docker-compose run app alembic upgrade head
