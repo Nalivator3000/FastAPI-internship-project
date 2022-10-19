@@ -33,7 +33,7 @@ async def get_user_by_id(id: int, response: Response):
         return {**user}
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
-        return {'message': f'User with id {id} isn`t found'}
+        return {'message': f'User with id {id} not found'}
 
 
 @router.get('/', response_model=List[UserDisplayWithId], status_code=status.HTTP_200_OK)
@@ -58,7 +58,7 @@ async def update_user(id: int, u: UserUpdateRequestModel, response: Response):
         return {**row}
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
-        return {'message': f'User with id {id} isn`t found'}
+        return {'message': f'User with id {id} not found'}
 
 
 @router.delete("/{id}", status_code=status.HTTP_200_OK)
@@ -71,4 +71,4 @@ async def delete(id: int, response: Response):
         return {'status': f'User {id} deleted successfully'}
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
-        return {'message': f'User with id {id} isn`t found'}
+        return {'message': f'User with id {id} not found'}
