@@ -3,6 +3,7 @@ from base.schemas import *
 from base.models import users
 from base.base import database
 from typing import List
+from base.hash import Hash
 
 router = APIRouter(
     prefix='/user',
@@ -15,7 +16,7 @@ async def sign_up_user(u: SignUpRequestModel):
     query = users.insert().values(
         name=u.name,
         email=u.email,
-        password=u.password,
+        password=Hash.bcrypt(u.password),
         bio=u.bio
     )
     record_id = await database.execute(query)
@@ -48,10 +49,11 @@ async def update_user(id: int, u: UserUpdateRequestModel, response: Response):
     query = users.update().where(users.c.id == id).values(
         name=u.name,
         email=u.email,
-        bio=u.bio
+        bio=u.bio,
     )
     user = await database.fetch_one(query)
     if user is not None:
+        response.status_code = status.HTTP_200_OK
         record_id = await database.execute(query)
         query = users.select().where(users.c.id == record_id)
         row = await database.fetch_one(query)
