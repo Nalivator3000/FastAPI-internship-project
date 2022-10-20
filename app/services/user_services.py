@@ -47,7 +47,6 @@ async def update_user(id: int, u: UserUpdateRequestModel, response: Response)\
             bio=u.bio,
         )
         response.status_code = status.HTTP_200_OK
-        record_id = await database.execute(query)
         query = users.select().where(users.c.id == id)
         row = await database.fetch_one(query)
         print('-\n-\n-\n-\n-\n', {**row}, '-\n-\n-\n-\n-\n')
