@@ -3,9 +3,10 @@ from base.hash import Hash
 from base.models import users
 from base.schemas import *
 from fastapi import status, Response
+from typing import List
 
 
-async def sign_up_user(u: SignUpRequestModel):
+async def sign_up_user(u) -> SignUpRequestModel:
     query = users.insert().values(
         name=u.name,
         email=u.email,
@@ -17,50 +18,51 @@ async def sign_up_user(u: SignUpRequestModel):
     query = users.select().where(users.c.id == record_id)
     row = await database.fetch_one(query)
 
-    return {**row}
+    return SignUpRequestModel(**row)
 
 
-async def get_user_by_id(id: int, response: Response):
-    query = users.select().where(users.c.id == id)
-    user = await database.fetch_one(query)
+async def get_user_by_id(id: int, response: Response) -> UserDisplayWithId or dict[str, str]:
+    user = await database.fetch_one(users.select().where(users.c.id == id))
     if user is not None:
         response.status_code = status.HTTP_200_OK
-        return {**user}
+        user = await database.fetch_one(users.select().where(users.c.id == id))
+        return UserDisplayWithId(**user)
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
         return {'message': f'User with id {id} not found'}
 
 
-async def get_all_users():
-    query = users.select()
-    all_get = await database.fetch_all(query)
-    return all_get
+async def get_all_users() -> List[UserDisplayWithId]:
+    user_list = await database.fetch_all(query=users.select())
+    return user_list
 
 
-async def update_user(id: int, u: UserUpdateRequestModel, response: Response):
-    query = users.update().where(users.c.id == id).values(
-        name=u.name,
-        email=u.email,
-        bio=u.bio,
-    )
-    user = await database.fetch_one(query)
+async def update_user(id: int, u: UserUpdateRequestModel, response: Response)\
+        -> UserUpdateRequestModel or dict[str:str]:
+    user = await database.fetch_one(users.select().where(users.c.id == id))
     if user is not None:
+        query = users.update().where(users.c.id == id).values(
+            name=u.name,
+            email=u.email,
+            bio=u.bio,
+        )
         response.status_code = status.HTTP_200_OK
         record_id = await database.execute(query)
         query = users.select().where(users.c.id == record_id)
         row = await database.fetch_one(query)
-        return {**row}
+        print('-\n-\n-\n-\n-\n', {**row}, '-\n-\n-\n-\n-\n')
+        return UserUpdateRequestModel(**row)
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
         return {'message': f'User with id {id} not found'}
 
 
 async def delete_user(id: int, response: Response):
-    query = users.delete().where(users.c.id == id)
-    user = await database.fetch_one(query)
+    user = await database.fetch_one(users.select().where(users.c.id == id))
     if user is not None:
-        await database.execute(query)
         response.status_code = status.HTTP_200_OK
+        query = users.delete().where(users.c.id == id)
+        await database.execute(query)
         return {'status': f'User {id} deleted successfully'}
     else:
         response.status_code = status.HTTP_404_NOT_FOUND

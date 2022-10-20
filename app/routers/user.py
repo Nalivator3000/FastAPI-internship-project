@@ -1,7 +1,9 @@
 from fastapi import APIRouter, status, Response
 from base.schemas import *
-from typing import List
-import services
+from typing import List, Any, Coroutine
+
+from base.schemas import SignUpRequestModel, UserDisplayWithId
+from services import user_services
 
 router = APIRouter(
     prefix='/user',
@@ -10,25 +12,26 @@ router = APIRouter(
 
 
 @router.post('/signup', response_model=SignUpRequestModel, status_code=status.HTTP_201_CREATED)
-async def sign_up_user(u: SignUpRequestModel):
-    return services.sign_up_user(u)
+async def sign_up_user(u: SignUpRequestModel) -> SignUpRequestModel:
+    return await user_services.sign_up_user(u)
 
 
-@router.get('/{id}', response_model=UserDisplayWithId, status_code=status.HTTP_200_OK)
-async def get_user_by_id(id: int, response: Response):
-    return services.get_user_by_id(id, response)
+@router.get('/{id}')
+async def get_user_by_id(id: int, response: Response) -> UserDisplayWithId or dict[str, str]:
+    return await user_services.get_user_by_id(id, response)
 
 
 @router.get('/', response_model=List[UserDisplayWithId], status_code=status.HTTP_200_OK)
-async def get_all_users():
-    return services.get_all_users()
+async def get_all_users() -> List[UserDisplayWithId]:
+    return await user_services.get_all_users()
 
 
-@router.put('/{id}', response_model=UserUpdateRequestModel, status_code=status.HTTP_200_OK)
-async def update_user(id: int, u: UserUpdateRequestModel, response: Response):
-    return services.update_user(id, u, response)
+@router.put('/{id}')
+async def update_user(id: int, u: UserUpdateRequestModel, response: Response)\
+        -> UserUpdateRequestModel or dict[str, str]:
+    return await user_services.update_user(id, u, response)
 
 
-@router.delete("/{id}", status_code=status.HTTP_200_OK)
+@router.delete("/{id}")
 async def delete_user(id: int, response: Response):
-    return services.delete_user(id, response)
+    return await user_services.delete_user(id, response)
