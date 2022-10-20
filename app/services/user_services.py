@@ -2,7 +2,7 @@ from base.base import database
 from base.hash import Hash
 from base.models import users
 from base.schemas import *
-from fastapi import status, Response
+from fastapi import status, Response, HTTPException
 from typing import List
 
 
@@ -21,15 +21,14 @@ async def sign_up_user(u) -> SignUpRequestModel:
     return SignUpRequestModel(**row)
 
 
-async def get_user_by_id(id: int, response: Response) -> UserDisplayWithId or dict[str, str]:
+async def get_user_by_id(id: int, response: Response) -> UserDisplayWithId:
     user = await database.fetch_one(users.select().where(users.c.id == id))
     if user is not None:
         response.status_code = status.HTTP_200_OK
         user = await database.fetch_one(users.select().where(users.c.id == id))
         return UserDisplayWithId(**user)
     else:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        return {'message': f'User with id {id} not found'}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id {id} not found')
 
 
 async def get_all_users() -> List[UserDisplayWithId]:
@@ -52,8 +51,7 @@ async def update_user(id: int, u: UserUpdateRequestModel, response: Response)\
         print('-\n-\n-\n-\n-\n', {**row}, '-\n-\n-\n-\n-\n')
         return UserUpdateRequestModel(**row)
     else:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        return {'message': f'User with id {id} not found'}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id {id} not found')
 
 
 async def delete_user(id: int, response: Response):
@@ -64,5 +62,4 @@ async def delete_user(id: int, response: Response):
         await database.execute(query)
         return {'status': f'User {id} deleted successfully'}
     else:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        return {'message': f'User with id {id} not found'}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id {id} not found')

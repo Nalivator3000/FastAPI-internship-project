@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, Response
 from base.schemas import *
-from typing import List, Any, Coroutine
+from typing import List
 
 from base.schemas import SignUpRequestModel, UserDisplayWithId
 from services import user_services
@@ -17,7 +17,7 @@ async def sign_up_user(u: SignUpRequestModel) -> SignUpRequestModel:
 
 
 @router.get('/{id}')
-async def get_user_by_id(id: int, response: Response) -> UserDisplayWithId or dict[str, str]:
+async def get_user_by_id(id: int, response: Response) -> UserDisplayWithId:
     return await user_services.get_user_by_id(id, response)
 
 
@@ -27,8 +27,7 @@ async def get_all_users() -> List[UserDisplayWithId]:
 
 
 @router.put('/{id}')
-async def update_user(id: int, u: UserUpdateRequestModel, response: Response)\
-        -> UserUpdateRequestModel or dict[str, str]:
+async def update_user(id: int, u: UserUpdateRequestModel, response: Response) -> UserUpdateRequestModel:
     return await user_services.update_user(id, u, response)
 
 
