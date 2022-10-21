@@ -10,7 +10,7 @@ class UserCRUD:
     def __init__(self):
         self.database = database
 
-    async def sign_up_user(u) -> SignUpRequestModel:
+    async def sign_up_user(u: SignUpRequestModel) -> SignUpRequestModel:
         query = users.insert().values(
             name=u.name,
             email=u.email,
@@ -40,6 +40,7 @@ class UserCRUD:
     async def update_user(id: int, u: UserUpdateRequestModel, response: Response) -> UserUpdateRequestModel:
         user = await database.fetch_one(users.select().where(users.c.id == id))
         if user is not None:
+            response.status_code = status.HTTP_200_OK
             users.update().where(users.c.id == id).values(
                 name=u.name,
                 email=u.email,
