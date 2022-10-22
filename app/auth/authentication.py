@@ -17,7 +17,6 @@ token_auth_scheme = HTTPBearer()
 @router.post('/auth-test')
 def auth_test(response: Response, token: str = Depends(token_auth_scheme)):
     result = VerifyToken(token.credentials).verify()
-    print(result)
 
     if result.get('status'):
         response.status_code = status.HTTP_400_BAD_REQUEST
