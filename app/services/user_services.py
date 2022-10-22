@@ -46,7 +46,6 @@ class UserCRUD:
                 email=u.email,
                 bio=u.bio,
             )
-            response.status_code = status.HTTP_200_OK
             query = users.select().where(users.c.id == id)
             row = await database.fetch_one(query)
             return UserUpdateRequestModel(**row)
