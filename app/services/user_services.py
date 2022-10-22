@@ -56,9 +56,8 @@ class UserCRUD:
     async def delete_user(id: int, response: Response):
         user = await database.fetch_one(users.select().where(users.c.id == id))
         if user is not None:
-            response.status_code = status.HTTP_200_OK
             query = users.delete().where(users.c.id == id)
             await database.execute(query)
-            raise HTTPException(status_code=status.HTTP_201_CREATED, detail=f'User {id} deleted successfully')
+            raise HTTPException(status_code=status.HTTP_200_OK, detail=f'User {id} deleted successfully')
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id {id} not found')
