@@ -22,4 +22,4 @@ def auth_test(response: Response, token: str = Depends(token_auth_scheme)):
         response.status_code = status.HTTP_400_BAD_REQUEST
         return result
 
-    return result
+    return result.get("email")
