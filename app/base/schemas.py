@@ -1,6 +1,5 @@
 import datetime
-from fastapi_jwt_auth import AuthJWT
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class UserDisplay(BaseModel):
@@ -30,8 +29,8 @@ class User(UserUpdateRequestModel):
 
 
 class SignInRequestModel(BaseModel):
-    email: str
-    password: str
+    email: EmailStr
+    hashed_password: str
 
     class Config:
         orm_mode = True
@@ -43,10 +42,9 @@ class SignInRequestModel(BaseModel):
         }
 
 
-class Settings(BaseModel):
-    authjwt_secret_key: str = 'eae62a7482658cb6d8af3bd1a70cc0689f1d1b81e28c78074c1c0c04fcd61100'
+class HTTPExceptionSchema(BaseModel):
+    status_code: str
+    detail: str
 
-
-@AuthJWT.load_config
-def get_config():
-    return Settings()
+    class Config:
+        schema_extra = {"detail": "HTTPException raised."}

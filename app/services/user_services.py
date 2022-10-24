@@ -52,7 +52,7 @@ class UserCRUD:
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id {id} not found')
 
-    async def delete_user(id: int, response: Response):
+    async def delete_user(id: int) -> HTTPExceptionSchema:
         user = await database.fetch_one(users.select().where(users.c.id == id))
         if user is not None:
             query = users.delete().where(users.c.id == id)
@@ -60,3 +60,17 @@ class UserCRUD:
             raise HTTPException(status_code=status.HTTP_200_OK, detail=f'User {id} deleted successfully')
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id {id} not found')
+
+    async def sign_up_user_by_email(user_email) -> SignUpRequestModel:
+        query = users.insert().values(
+            name=str(user_email).split('@')[0],
+            email=user_email,
+            password=Hash.bcrypt(str(user_email)),
+            bio='Deafault bio'
+        )
+
+        record_id = await database.execute(query)
+        query = users.select().where(users.c.id == record_id)
+        row = await database.fetch_one(query)
+
+        return SignUpRequestModel(**row)

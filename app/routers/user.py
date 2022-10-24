@@ -31,6 +31,6 @@ async def update_user(id: int, u: UserUpdateRequestModel, response: Response) ->
     return await user_services.UserCRUD.update_user(id, u, response)
 
 
-@router.delete("/{id}")
-async def delete_user(id: int, response: Response):
-    return await user_services.UserCRUD.delete_user(id, response)
+@router.delete("/{id}", response_model=HTTPExceptionSchema)
+async def delete_user(id: int) -> HTTPExceptionSchema:
+    return await user_services.UserCRUD.delete_user(id)
