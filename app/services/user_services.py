@@ -41,7 +41,7 @@ class UserCRUD:
         user = await database.fetch_one(users.select().where(users.c.id == id))
         if user is not None:
             response.status_code = status.HTTP_200_OK
-            users.update().where(users.c.id == id).values(
+            user.update().values(
                 name=u.name,
                 email=u.email,
                 bio=u.bio,
@@ -61,12 +61,12 @@ class UserCRUD:
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id {id} not found')
 
-    async def sign_up_user_by_email(user_email) -> SignUpRequestModel:
+    async def sign_up_user_by_email(user_email: EmailStr) -> SignUpRequestModel:
         query = users.insert().values(
             name=str(user_email).split('@')[0],
             email=user_email,
-            password=Hash.bcrypt(str(user_email)),
-            bio='Deafault bio'
+            password=Hash.bcrypt(user_email),
+            bio='Default bio'
         )
 
         record_id = await database.execute(query)
