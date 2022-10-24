@@ -1,8 +1,8 @@
-from fastapi import APIRouter, status, Response, Depends
+from fastapi import APIRouter, status, Response, Depends, HTTPException
 from base.schemas import *
 from typing import List
 
-from base.schemas import SignUpRequestModel, UserDisplayWithId
+from base.schemas import SignUpRequestModel, UserDisplayWithId, HTTPExceptionSchema
 from services import user_services
 
 router = APIRouter(
