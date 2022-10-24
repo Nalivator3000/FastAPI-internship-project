@@ -35,3 +35,11 @@ class SignInRequestModel(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class HTTPExceptionSchema(BaseModel):
+    status_code: str
+    detail: str
+
+    class Config:
+        schema_extra = {"detail": "HTTPException raised."}

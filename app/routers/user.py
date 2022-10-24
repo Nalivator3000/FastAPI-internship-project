@@ -1,8 +1,8 @@
-from fastapi import APIRouter, status, Response
+from fastapi import APIRouter, status, Response, HTTPException
 from base.schemas import *
 from typing import List
 
-from base.schemas import SignUpRequestModel, UserDisplayWithId
+from base.schemas import SignUpRequestModel, UserDisplayWithId, HTTPExceptionSchema
 from services import user_services
 
 router = APIRouter(
@@ -31,6 +31,6 @@ async def update_user(id: int, u: UserUpdateRequestModel, response: Response) ->
     return await user_services.UserCRUD.update_user(id, u, response)
 
 
-@router.delete("/{id}")
-async def delete_user(id: int, response: Response):
+@router.delete("/{id}", response_model=HTTPExceptionSchema)
+async def delete_user(id: int, response: Response) -> HTTPExceptionSchema:
     return await user_services.UserCRUD.delete_user(id, response)

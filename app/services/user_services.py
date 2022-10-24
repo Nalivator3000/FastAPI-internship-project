@@ -53,7 +53,7 @@ class UserCRUD:
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id {id} not found')
 
-    async def delete_user(id: int, response: Response):
+    async def delete_user(id: int, response: Response) -> HTTPExceptionSchema:
         user = await database.fetch_one(users.select().where(users.c.id == id))
         if user is not None:
             response.status_code = status.HTTP_200_OK
