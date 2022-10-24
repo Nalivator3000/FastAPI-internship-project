@@ -1,17 +1,14 @@
 import os
-
-import uvicorn
-from dotenv import load_dotenv
 from fastapi import FastAPI
-from fastapi_sqlalchemy import DBSessionMiddleware
-
-from base.base import db
+from dotenv import load_dotenv
+from base.base import database
+from routers import user
 
 load_dotenv("../.env")
 
 app = FastAPI()
 
-app.add_middleware(DBSessionMiddleware, db_url=os.environ["DATABASE_URL"])
+app.include_router(user.router)
 
 
 @app.get('/')
@@ -21,13 +18,14 @@ def index():
 
 @app.on_event("startup")
 async def startup():
-    await db.connect()
+    await database.connect()
 
 
 @app.on_event("shutdown")
 async def shutdown():
-    await db.disconnect()
+    await database.disconnect()
 
 
 if __name__ == "__main__":
+    import uvicorn
     uvicorn.run(app, host=os.environ["APP_HOST"], port=os.environ["APP_PORT"])

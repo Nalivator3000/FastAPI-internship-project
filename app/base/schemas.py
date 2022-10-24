@@ -1,32 +1,32 @@
 import datetime
 
 from pydantic import BaseModel
-from typing import List
 
 
-class SignUpRequestModel(BaseModel):
+class UserDisplay(BaseModel):
     name: str
     email: str
-    password: str
-    bio: str
-    time_created: datetime.datetime
+    bio: str = None
 
     class Config:
         orm_mode = True
 
 
-class UserUpdateRequestModel(SignUpRequestModel):
-    time_updated: datetime.datetime
+class UserDisplayWithId(UserDisplay):
+    id: int
 
-    # class Config:
-    #     orm_mode = True
+
+class SignUpRequestModel(UserDisplay):
+    password: str
+    time_created: datetime.datetime
+
+
+class UserUpdateRequestModel(UserDisplay):
+    time_updated: datetime.datetime
 
 
 class User(UserUpdateRequestModel):
     id: int
-
-    # class Config:
-    #     orm_mode = True
 
 
 class SignInRequestModel(BaseModel):
@@ -37,8 +37,9 @@ class SignInRequestModel(BaseModel):
         orm_mode = True
 
 
-class UsersListResponse(BaseModel):
-    users: List[User] = []
+class HTTPExceptionSchema(BaseModel):
+    status_code: str
+    detail: str
 
     class Config:
-        orm_mode = True
+        schema_extra = {"detail": "HTTPException raised."}
