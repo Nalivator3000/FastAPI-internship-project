@@ -1,5 +1,6 @@
 import datetime
 from pydantic import BaseModel, EmailStr
+import os
 
 
 class UserDisplay(BaseModel):
@@ -48,3 +49,11 @@ class HTTPExceptionSchema(BaseModel):
 
     class Config:
         schema_extra = {"detail": "HTTPException raised."}
+
+
+class Settings(BaseModel):
+    authjwt_secret_key: str = os.environ["SECRET_KEY"]
+
+
+class Token(BaseModel):
+    access_token: str
