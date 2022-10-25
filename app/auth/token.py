@@ -2,6 +2,10 @@ import os
 import jwt
 from configparser import ConfigParser
 
+from fastapi.security import HTTPBearer
+
+token_auth_scheme = HTTPBearer()
+
 
 def set_up():
     """Sets up configuration for the app"""
