@@ -8,7 +8,6 @@ token_auth_scheme = HTTPBearer()
 
 
 def set_up():
-
     env = os.getenv("ENV", ".config")
 
     if env == ".config":

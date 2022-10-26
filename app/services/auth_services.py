@@ -30,7 +30,7 @@ class AuthCRUD:
         user_email = result.get("email")
         user = await database.fetch_one(users.select().where(users.c.email == user_email))
         if user is None:
-            raise await UserCRUD.sign_up_user_by_email(user_email)
+            return await UserCRUD.sign_up_user_by_email(user_email)
         if result.get('status'):
             status_code = response.status_code = status.HTTP_400_BAD_REQUEST
             raise status_code
