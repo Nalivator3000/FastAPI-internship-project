@@ -24,7 +24,7 @@ class AuthCRUD:
     def __init__(self):
         self.database = database
 
-    async def auth_test(response: Response, token: str = Depends(token_auth_scheme)) -> EmailStr:
+    async def auth0_test(response: Response, token: str = Depends(token_auth_scheme)) -> EmailStr:
         response.status_code = status.HTTP_202_ACCEPTED
         result = VerifyToken(token.credentials).verify()
         user_email = result.get("email")
@@ -49,3 +49,4 @@ class AuthCRUD:
                 access_token=create_access_token({"sub": user.email}),
                 token_type="Bearer"
             )
+
