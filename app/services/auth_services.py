@@ -48,3 +48,7 @@ class AuthCRUD:
                 access_token=create_access_token({"sub": user.email}),
                 token_type="Bearer"
             )
+
+    async def test_decode_jwt(self, response: Response, token: str = Depends()) -> dict:
+        response.status_code = status.HTTP_202_ACCEPTED
+        return {'token': jwt.decode(token, SECRET_KEY, ALGORITHM)}
