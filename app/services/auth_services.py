@@ -23,11 +23,11 @@ class AuthCRUD:
     def __init__(self):
         self.database = database
 
-    async def auth0_test(response: Response, token: str = Depends(token_auth_scheme)) -> EmailStr:
+    async def auth0_test(self, response: Response, token: str = Depends(token_auth_scheme)) -> EmailStr:
         response.status_code = status.HTTP_202_ACCEPTED
         result = VerifyToken(token.credentials).verify()
         user_email = result.get("email")
-        user = await database.fetch_one(users.select().where(users.c.email == user_email))
+        user = await self.database.fetch_one(users.select().where(users.c.email == user_email))
         if user is None:
             return await UserCRUD.sign_up_user_by_email(user_email)
         if result.get('status'):
@@ -35,8 +35,8 @@ class AuthCRUD:
             raise status_code
         return user_email
 
-    async def login(email: EmailStr, password: str, response: Response) -> Token:
-        user = await database.fetch_one(users.select().where(users.c.email == email))
+    async def login(self, email: EmailStr, password: str, response: Response) -> Token:
+        user = await self.database.fetch_one(users.select().where(users.c.email == email))
         if user is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with email {email} not found')
         elif not Hash.verify(password, user.password):
