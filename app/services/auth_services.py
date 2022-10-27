@@ -20,7 +20,6 @@ def create_access_token(data: dict):
 
 
 class AuthCRUD:
-
     def __init__(self):
         self.database = database
 
@@ -49,4 +48,3 @@ class AuthCRUD:
                 access_token=create_access_token({"sub": user.email}),
                 token_type="Bearer"
             )
-
