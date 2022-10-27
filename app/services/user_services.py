@@ -2,7 +2,7 @@ from base.base import database
 from base.hash import Hash
 from base.models import users
 from base.schemas import *
-from fastapi import status, Response, HTTPException
+from fastapi import status, Response, HTTPException, Depends
 from typing import List
 
 
