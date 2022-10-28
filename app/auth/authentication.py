@@ -13,17 +13,11 @@ async def auth_test(response: Response, token: str = Depends(token_auth_scheme))
     return await AuthCRUD().auth0_test(response, token)
 
 
-@router.post('/login', response_model=Token, status_code=status.HTTP_201_CREATED)
+@router.post('/get-token', response_model=Token, status_code=status.HTTP_201_CREATED)
 async def login(email: EmailStr, password: str, response: Response) -> Token:
-        return await AuthCRUD().login(email, password, response)
-
-
-# @router.post('/test-jwt', status_code=status.HTTP_202_ACCEPTED)
-# async def test_decode_jwt(response: Response, token: str) -> dict:
-#     return await AuthCRUD().test_decode_jwt(response, token)
+    return await AuthCRUD().get_token(email, password, response)
 
 
 @router.post('/get-current-user', response_model=UserDisplayWithId, status_code=status.HTTP_200_OK)
 async def get_current_user(token: str) -> UserDisplayWithId:
-    return await AuthCRUD().get_current_user(token)
-
+    return await AuthCRUD().get_current_user_service(token)

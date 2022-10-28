@@ -27,16 +27,8 @@ def verify_password(password: str, hashed_password: str) -> bool:
     return Hash.verify(password, hashed_password)
 
 
-async def decode_token(token: str) -> str:
+def decode_token(token: str) -> dict:
     return jwt.decode(token, SECRET_KEY, ALGORITHM)
-
-
-async def get_current_user(token: str) -> UserDisplayWithId:
-    decoded_token = decode_token(token)
-    user = await database.fetch_one(users.select().where(users.c.email == decoded_token['sub']))
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid email or password')
-    return user
 
 
 class AuthCRUD:
@@ -52,7 +44,7 @@ class AuthCRUD:
             return await UserCRUD.sign_up_user_by_email(user_email)
         return user_email
 
-    async def login(self, email: EmailStr, password: str, response: Response) -> Token:
+    async def get_token(self, email: EmailStr, password: str, response: Response) -> Token:
         user = await self.database.fetch_one(users.select().where(users.c.email == email))
         if user is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with email {email} not found')
@@ -65,3 +57,10 @@ class AuthCRUD:
                 access_token=create_access_token({"sub": user.email}),
                 token_type="Bearer"
             )
+
+    async def get_current_user_service(self, token: str) -> UserDisplayWithId:
+        decoded_token = decode_token(token)
+        user = await self.database.fetch_one(users.select().where(users.c.email == decoded_token['sub']))
+        if not user:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid email or password')
+        return user
