@@ -59,8 +59,12 @@ class AuthCRUD:
             )
 
     async def get_current_user_service(self, token: str) -> UserDisplayWithId:
-        decoded_token = decode_token(token)
-        user = await self.database.fetch_one(users.select().where(users.c.email == decoded_token['sub']))
+        try:
+            email = await self.auth0_test(response=Response, token=token)
+            user = await self.database.fetch_one(users.select().where(users.c.email == email))
+        except:
+            decoded_token = decode_token(token)
+            user = await self.database.fetch_one(users.select().where(users.c.email == decoded_token['sub']))
         if not user:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid email or password')
         return user
