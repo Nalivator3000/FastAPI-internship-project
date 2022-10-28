@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, Response, Depends, HTTPException
 
-from auth.authentication import get_current_user
+from services.auth_services import get_current_user
 from base.schemas import *
 from typing import List
 from base.schemas import SignUpRequestModel, UserDisplayWithId, HTTPExceptionSchema
@@ -13,7 +13,7 @@ router = APIRouter(
 
 
 @router.post('/signup', response_model=SignUpRequestModel, status_code=status.HTTP_201_CREATED)
-async def sign_up_user(u: SignUpRequestModel, current_user=Depends(get_current_user)) -> SignUpRequestModel:
+async def sign_up_user(u: SignUpRequestModel) -> SignUpRequestModel:
     return await user_services.UserCRUD().sign_up_user(u=u)
 
 

@@ -18,6 +18,6 @@ async def login(email: EmailStr, password: str, response: Response) -> Token:
     return await AuthCRUD().get_token(email=email, password=password, response=response)
 
 
-@router.post('/get-current-user', response_model=UserDisplayWithId, status_code=status.HTTP_200_OK)
-async def get_current_user(token: str) -> UserDisplayWithId:
-    return await AuthCRUD().get_current_user_service(token=token)
+# @router.post('/get-current-user', response_model=UserDisplayWithId, status_code=status.HTTP_200_OK)
+# async def get_current_user(token: str) -> UserDisplayWithId:
+#     return await AuthCRUD().get_current_user_service(token=token)

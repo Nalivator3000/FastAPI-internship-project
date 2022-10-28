@@ -1,5 +1,5 @@
 import datetime
-
+from fastapi.security import HTTPBearer
 from jose import jwt
 from pydantic import EmailStr
 from fastapi import Response, Depends, HTTPException, status
@@ -27,8 +27,20 @@ def verify_password(password: str, hashed_password: str) -> bool:
     return Hash.verify(password, hashed_password)
 
 
-def decode_token(token: str) -> dict:
+def decode_token(token: str):
     return jwt.decode(token, SECRET_KEY, ALGORITHM)
+
+
+async def get_current_user(token=Depends(HTTPBearer())) -> UserDisplayWithId:
+    try:
+        email = await AuthCRUD().auth0_test(response=Response, token=token)
+        user = await database.fetch_one(users.select().where(users.c.email == email))
+    except:
+        decoded_token = decode_token(token)
+        user = await database.fetch_one(users.select().where(users.c.email == decoded_token['sub']))
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid email or password')
+    return user
 
 
 class AuthCRUD:
@@ -57,14 +69,3 @@ class AuthCRUD:
                 access_token=create_access_token({"sub": user.email}),
                 token_type="Bearer"
             )
-
-    async def get_current_user_service(self, token: str) -> UserDisplayWithId:
-        try:
-            email = await self.auth0_test(response=Response, token=token)
-            user = await self.database.fetch_one(users.select().where(users.c.email == email))
-        except:
-            decoded_token = decode_token(token)
-            user = await self.database.fetch_one(users.select().where(users.c.email == decoded_token['sub']))
-        if not user:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid email or password')
-        return user
