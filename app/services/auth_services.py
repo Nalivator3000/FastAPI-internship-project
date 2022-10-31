@@ -33,8 +33,11 @@ async def get_current_user(token=Depends(HTTPBearer())) -> UserDisplayWithId:
         email = await AuthCRUD().auth0_test(response=Response, token=token)
         user = await database.fetch_one(users.select().where(users.c.email == email))
     except:
-        decoded_token = decode_token(token=token)
-        user = await database.fetch_one(users.select().where(users.c.email == decoded_token['sub']))
+        try:
+            decoded_token = decode_token(token=token)
+            user = await database.fetch_one(users.select().where(users.c.email == decoded_token['sub']))
+        except:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Invalid token')
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid email or password')
     return user
@@ -45,24 +48,31 @@ class AuthCRUD:
         self.database = database
 
     async def auth0_test(self, response: Response, token: str = Depends(token_auth_scheme)) -> EmailStr:
-        response.status_code = status.HTTP_202_ACCEPTED
-        result = VerifyToken(token.credentials).verify()
-        user_email = result.get("email")
-        user = await self.database.fetch_one(users.select().where(users.c.email == user_email))
-        if user is None:
-            return await UserCRUD().sign_up_user_by_email(user_email)
+        try:
+            response.status_code = status.HTTP_202_ACCEPTED
+            result = VerifyToken(token.credentials).verify()
+            user_email = result.get("email")
+            user = await self.database.fetch_one(users.select().where(users.c.email == user_email))
+            if user is None:
+                return await UserCRUD().sign_up_user_by_email(user_email)
+        except:
+            HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
         return user_email
 
     async def get_token(self, email: EmailStr, password: str, response: Response) -> Token:
-        user = await self.database.fetch_one(users.select().where(users.c.email == email))
-        if user is None:
-            return await UserCRUD().sign_up_user_by_email(email)
-        elif not verify_password(password, user.password):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Password is not correct')
-        else:
-            response.status_code = status.HTTP_202_ACCEPTED
+        try:
+            user = await self.database.fetch_one(users.select().where(users.c.email == email))
+            if user is None:
+                return await UserCRUD().sign_up_user_by_email(email)
+            elif not verify_password(password, user.password):
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Password is not correct')
+            else:
+                response.status_code = status.HTTP_202_ACCEPTED
+        except:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User not found')
 
-            return Token(
-                access_token=create_access_token({"sub": user.email}),
-                token_type="Bearer"
-            )
+        return Token(
+            access_token=create_access_token({"sub": user.email}),
+            token_type="Bearer"
+        )
