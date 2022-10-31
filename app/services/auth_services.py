@@ -61,16 +61,13 @@ class AuthCRUD:
         return user_email
 
     async def get_token(self, email: EmailStr, password: str, response: Response) -> Token:
-        try:
-            user = await self.database.fetch_one(users.select().where(users.c.email == email))
-            if user is None:
-                return await UserCRUD().sign_up_user_by_email(email)
-            elif not verify_password(password, user.password):
-                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Password is not correct')
-            else:
-                response.status_code = status.HTTP_202_ACCEPTED
-        except:
+        user = await self.database.fetch_one(users.select().where(users.c.email == email))
+        if user is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User not found')
+        elif not verify_password(password, user.password):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Login or password is not correct')
+        else:
+            response.status_code = status.HTTP_202_ACCEPTED
 
         return Token(
             access_token=create_access_token({"sub": user.email}),
