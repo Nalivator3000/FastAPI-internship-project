@@ -25,7 +25,6 @@ def verify_password(password: str, hashed_password: str) -> bool:
 
 
 def decode_token(token: str):
-    print(token)
     return jwt.decode(token.credentials, SECRET_KEY, ALGORITHM)
 
 
