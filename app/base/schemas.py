@@ -21,12 +21,18 @@ class SignUpRequestModel(UserDisplay):
     time_created: datetime.datetime
 
 
-class UserUpdateRequestModel(UserDisplay):
+class UserUpdateRequestModel(BaseModel):
+    name: str
+    password: str
+    bio: str
     time_updated: datetime.datetime
 
+    class Config:
+        orm_mode = True
 
-class User(UserUpdateRequestModel):
-    id: int
+
+class User(UserDisplayWithId):
+    time_updated: str
 
 
 class SignInRequestModel(BaseModel):

@@ -5,6 +5,8 @@ from base.schemas import *
 from fastapi import status, Response, HTTPException
 from typing import List
 
+from services.validation import *
+
 
 class UserCRUD:
     def __init__(self):
@@ -37,23 +39,29 @@ class UserCRUD:
         user_list = await self.database.fetch_all(query=users.select())
         return user_list
 
-    async def update_user(self, id: int, u: UserUpdateRequestModel, response: Response) -> UserUpdateRequestModel:
+    async def update_user(self, id: int, u: UserUpdateRequestModel, response: Response, current_user: UserDisplayWithId)\
+            -> UserUpdateRequestModel:
         user = await self.database.fetch_one(users.select().where(users.c.id == id))
+        user_update_validation(current_user=current_user, user_id=user.id)
         if user is not None:
             response.status_code = status.HTTP_200_OK
-            user.update().values(
+            query = users.update().where(users.c.id == id).values(
                 name=u.name,
-                email=u.email,
-                bio=u.bio,
+                password=Hash.bcrypt(u.password),
+                bio=u.bio
             )
-            query = users.select().where(users.c.id == id)
+
+            await self.database.execute(query)
+            query = users.select().where(users.c.id == user.id)
             row = await self.database.fetch_one(query)
+
             return UserUpdateRequestModel(**row)
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id {id} not found')
 
-    async def delete_user(self, id: int) -> HTTPExceptionSchema:
+    async def delete_user(self, id: int, current_user: UserDisplayWithId) -> HTTPExceptionSchema:
         user = await self.database.fetch_one(users.select().where(users.c.id == id))
+        user_update_validation(current_user=current_user, user_id=user.id)
         if user is not None:
             query = users.delete().where(users.c.id == id)
             await self.database.execute(query)
