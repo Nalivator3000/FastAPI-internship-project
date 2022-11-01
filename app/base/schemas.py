@@ -1,6 +1,6 @@
 import datetime
-
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
+import os
 
 
 class UserDisplay(BaseModel):
@@ -30,11 +30,17 @@ class User(UserUpdateRequestModel):
 
 
 class SignInRequestModel(BaseModel):
-    email: str
-    password: str
+    email: EmailStr
+    hashed_password: str
 
     class Config:
         orm_mode = True
+        schema_extra = {
+            'example': {
+                'email': 'this_is@your.email',
+                'password': 'password_which_you_forgot'
+            }
+        }
 
 
 class HTTPExceptionSchema(BaseModel):
@@ -43,3 +49,11 @@ class HTTPExceptionSchema(BaseModel):
 
     class Config:
         schema_extra = {"detail": "HTTPException raised."}
+
+
+class Settings(BaseModel):
+    authjwt_secret_key: str = os.environ["SECRET_KEY"]
+
+
+class Token(BaseModel):
+    access_token: str

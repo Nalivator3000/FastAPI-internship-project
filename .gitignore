@@ -133,3 +133,5 @@ tutorial.md
 /scr/__pycache__
 
 /app/__pycache__/
+
+/app/.config
