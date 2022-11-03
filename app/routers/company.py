@@ -29,7 +29,7 @@ async def get_all_companies(current_user=Depends(get_current_user)) -> List[Comp
 
 
 @router.put('/{id}', response_model=CompanyUpdate)
-async def update_company(id: int, company: CompanyUpdate, response: Response, current_user=Depends(get_current_user))\
+async def update_company(id: int, company: CompanyUpdate, response: Response, current_user=Depends(get_current_user)) \
         -> CompanyUpdate:
     return await company_services.CompanyCRUD().update_company(
         id=id, company=company, response=response, current_user=current_user)
@@ -38,3 +38,50 @@ async def update_company(id: int, company: CompanyUpdate, response: Response, cu
 @router.delete("/{id}", response_model=HTTPExceptionSchema)
 async def delete_company(id: int, current_user=Depends(get_current_user)) -> HTTPExceptionSchema:
     return await company_services.CompanyCRUD().delete_company(id=id, current_user=current_user)
+
+
+@router.put('/{user_id}/{company_id}')
+async def add_user_to_company(company_id: int, user_id: int, current_user=Depends(get_current_user)):
+    return await company_services.CompanyCRUD().add_user_to_company(
+        company_id=company_id, user_id=user_id, current_user=current_user
+    )
+
+
+@router.delete('/{user_id}/{company_id}')
+async def delete_user_from_company(company_id: int, user_id: int, current_user=Depends(get_current_user)):
+    return await company_services.CompanyCRUD().delete_user_from_company(
+        cid=company_id, uid=user_id, current_user=current_user
+    )
+
+
+@router.put('/invite/{company_id}')
+async def accept_invitation(answer: bool, company_id: int, current_user=Depends(get_current_user)):
+    return await company_services.CompanyCRUD().accept_invitation(
+        answer=answer, cid=company_id, current_user=current_user
+    )
+
+
+@router.put('/join/{company_id}')
+async def join_group(company_id: int, current_user=Depends(get_current_user)):
+    return await company_services.CompanyCRUD().join_group(cid=company_id, current_user=current_user)
+
+
+@router.put('/application/{company_id}/{user_id}')
+async def approve_application(answer: bool, user_id: int, company_id: int, current_user=Depends(get_current_user)):
+    return await company_services.CompanyCRUD().approve_application(
+        answer=answer, uid=user_id, cid=company_id, current_user=current_user
+    )
+
+
+@router.post('/admin/{company_id}/{user_id}')
+async def add_admin_to_company(company_id: int, user_id: int, current_user=Depends(get_current_user)):
+    return await company_services.CompanyCRUD().add_admin_to_company(
+        cid=company_id, uid=user_id, current_user=current_user
+    )
+
+
+@router.delete('/admin/{company_id}/{user_id}')
+async def delete_admin_from_company(user_id: int, company_id: int, current_user=Depends(get_current_user)):
+    return await company_services.CompanyCRUD().delete_admin_from_company(
+        uid=user_id, cid=company_id, current_user=current_user
+    )
