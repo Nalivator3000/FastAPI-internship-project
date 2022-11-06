@@ -4,7 +4,7 @@ from fastapi import Response, status, HTTPException
 
 from base.base import database
 from base.models import companies, users, companies_users, companies_administrators, invites, applications
-from base.schemas import Company, UserDisplayWithId, CompanyUpdate, HTTPExceptionSchema, UserDisplay
+from base.schemas import Company, UserDisplayWithId, CompanyUpdate, HTTPExceptionSchema, UserDisplay, AllInvitesSchema
 from services.validation import company_update_validation, company_delete_validation, company_applications_validation, \
     add_admin_validation, delete_admin_validation
 
@@ -13,7 +13,7 @@ class CompanyCRUD:
     def __init__(self):
         self.database = database
 
-    async def create_company(self, company: Company, response: Response, current_user: UserDisplayWithId):
+    async def create_company(self, company: Company, response: Response, current_user: UserDisplayWithId) -> Company:
         response.status_code = status.HTTP_201_CREATED
         query = companies.insert().values(
             name=company.name,
@@ -40,7 +40,8 @@ class CompanyCRUD:
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Company with id {id} not found')
 
-    async def get_all_companies(self) -> List[UserDisplayWithId]:
+    async def get_all_companies(self, response: Response) -> List[UserDisplayWithId]:
+        response.status_code = status.HTTP_200_OK
         companies_list = await self.database.fetch_all(companies.select().where(companies.c.is_hide == False))
         return companies_list
 
@@ -201,13 +202,16 @@ class CompanyCRUD:
             raise HTTPException(status_code=status.HTTP_200_OK,
                                 detail=f'User {uid} deleted from company {cid} successfully')
 
-    async def get_all_invites(self, current_user: UserDisplayWithId):
+    async def get_all_invites(self, response: Response, current_user: UserDisplayWithId) -> List[AllInvitesSchema]:
+        response.status_code = status.HTTP_200_OK
         all_invites = await self.database.fetch_all(invites.select().where(invites.c.user_id == current_user.id))
         if not all_invites:
             raise HTTPException(status_code=status.HTTP_200_OK, detail='You have no invites')
         return all_invites
 
-    async def get_all_applications(self, cid: id, current_user: UserDisplayWithId):
+    async def get_all_applications(self, cid: id, response: Response, current_user: UserDisplayWithId)\
+            -> List[AllInvitesSchema]:
+        response.status_code = status.HTTP_200_OK
         company = await self.database.fetch_one(companies.select().where(companies.c.id == cid))
         company_applications_validation(company=company, current_user=current_user)
         all_applications = await self.database.fetch_all(

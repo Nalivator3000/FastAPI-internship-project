@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, status, Depends, Response
 
-from base.schemas import Company, CompanyUpdate, HTTPExceptionSchema, UserDisplayWithId
+from base.schemas import Company, CompanyUpdate, HTTPExceptionSchema, UserDisplayWithId, AllInvitesSchema
 from services import company_services
 from services.auth_services import get_current_user
 
@@ -24,7 +24,7 @@ async def get_company_by_id(id: int, response: Response, current_user=Depends(ge
 
 
 @router.get('/', response_model=List[Company], status_code=status.HTTP_200_OK)
-async def get_all_companies(current_user=Depends(get_current_user)) -> list[UserDisplayWithId]:
+async def get_all_companies(response: Response, current_user=Depends(get_current_user)) -> list[Company]:
     return await company_services.CompanyCRUD().get_all_companies()
 
 
@@ -40,7 +40,7 @@ async def delete_company(id: int, current_user=Depends(get_current_user)) -> HTT
     return await company_services.CompanyCRUD().delete_company(id=id, current_user=current_user)
 
 
-@router.post('/{user_id}/{company_id}/')
+@router.post('/{user_id}/{company_id}/', response_model=HTTPExceptionSchema)
 async def invite_user_to_company(company_id: int, user_id: int, current_user=Depends(get_current_user))\
         -> HTTPExceptionSchema:
     return await company_services.CompanyCRUD().invite_user_to_company(
@@ -48,7 +48,7 @@ async def invite_user_to_company(company_id: int, user_id: int, current_user=Dep
     )
 
 
-@router.delete('/{user_id}/{company_id}/')
+@router.delete('/{user_id}/{company_id}/', response_model=HTTPExceptionSchema)
 async def delete_user_from_company(company_id: int, user_id: int, current_user=Depends(get_current_user))\
         -> HTTPExceptionSchema:
     return await company_services.CompanyCRUD().delete_user_from_company(
@@ -56,7 +56,7 @@ async def delete_user_from_company(company_id: int, user_id: int, current_user=D
     )
 
 
-@router.post('/me/invites/{company_id}/')
+@router.post('/me/invites/{company_id}/', response_model=HTTPExceptionSchema)
 async def accept_invitation(answer: bool, company_id: int, current_user=Depends(get_current_user))\
         -> HTTPExceptionSchema:
     return await company_services.CompanyCRUD().accept_invitation(
@@ -64,12 +64,12 @@ async def accept_invitation(answer: bool, company_id: int, current_user=Depends(
     )
 
 
-@router.put('/join/{company_id}/')
+@router.put('/join/{company_id}/', response_model=HTTPExceptionSchema)
 async def join_company(company_id: int, current_user=Depends(get_current_user)) -> HTTPExceptionSchema:
     return await company_services.CompanyCRUD().join_company(cid=company_id, current_user=current_user)
 
 
-@router.post('/application/{company_id}/{user_id}/')
+@router.post('/application/{company_id}/{user_id}/', response_model=HTTPExceptionSchema)
 async def approve_application(answer: bool, user_id: int, company_id: int, current_user=Depends(get_current_user))\
         -> HTTPExceptionSchema:
     return await company_services.CompanyCRUD().approve_application(
@@ -77,7 +77,7 @@ async def approve_application(answer: bool, user_id: int, company_id: int, curre
     )
 
 
-@router.post('/admin/{company_id}/{user_id}/')
+@router.post('/admin/{company_id}/{user_id}/', response_model=HTTPExceptionSchema)
 async def add_admin_to_company(company_id: int, user_id: int, current_user=Depends(get_current_user))\
         -> HTTPExceptionSchema:
     return await company_services.CompanyCRUD().add_admin_to_company(
@@ -85,7 +85,7 @@ async def add_admin_to_company(company_id: int, user_id: int, current_user=Depen
     )
 
 
-@router.delete('/admin/{company_id}/{user_id}/')
+@router.delete('/admin/{company_id}/{user_id}/', response_model=HTTPExceptionSchema)
 async def delete_admin_from_company(user_id: int, company_id: int, current_user=Depends(get_current_user))\
         -> HTTPExceptionSchema:
     return await company_services.CompanyCRUD().delete_admin_from_company(
@@ -93,11 +93,12 @@ async def delete_admin_from_company(user_id: int, company_id: int, current_user=
     )
 
 
-@router.get('/me/invites/')
-async def get_all_invites(current_user=Depends(get_current_user)):
+@router.get('/me/invites/', response_model=list[AllInvitesSchema])
+async def get_all_invites(response: Response, current_user=Depends(get_current_user)) -> list[AllInvitesSchema]:
     return await company_services.CompanyCRUD().get_all_invites(current_user=current_user)
 
 
-@router.get('/me/applications/')
-async def get_all_applications(company_id: int, current_user=Depends(get_current_user)):
+@router.get('/me/applications/', response_model=list[AllInvitesSchema])
+async def get_all_applications(company_id: int, response: Response, current_user=Depends(get_current_user))\
+        -> List[AllInvitesSchema]:
     return await company_services.CompanyCRUD().get_all_applications(cid=company_id, current_user=current_user)

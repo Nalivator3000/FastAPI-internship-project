@@ -77,3 +77,8 @@ class CompanyUpdate(BaseModel):
 
 class Company(CompanyUpdate):
     owner: EmailStr
+
+
+class AllInvitesSchema(BaseModel):
+    user_id: int
+    company_id: int
