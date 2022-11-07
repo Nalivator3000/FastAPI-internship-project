@@ -63,3 +63,22 @@ class Settings(BaseModel):
 
 class Token(BaseModel):
     access_token: str
+
+
+class CompanyUpdate(BaseModel):
+    name: str
+    description: str
+    is_hide: bool
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class Company(CompanyUpdate):
+    owner: EmailStr
+
+
+class AllInvitesSchema(BaseModel):
+    user_id: int
+    company_id: int

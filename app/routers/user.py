@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Response, Depends, HTTPException
+from fastapi import APIRouter, status, Response, Depends
 from base.schemas import *
 from typing import List
 from base.schemas import SignUpRequestModel, UserDisplayWithId, HTTPExceptionSchema

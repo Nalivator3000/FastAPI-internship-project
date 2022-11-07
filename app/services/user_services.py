@@ -2,7 +2,7 @@ from base.base import database
 from base.hash import Hash
 from base.models import users
 from base.schemas import *
-from fastapi import status, Response, HTTPException
+from fastapi import Response
 from typing import List
 
 from services.validation import *
@@ -61,7 +61,7 @@ class UserCRUD:
 
     async def delete_user(self, id: int, current_user: UserDisplayWithId) -> HTTPExceptionSchema:
         user = await self.database.fetch_one(users.select().where(users.c.id == id))
-        user_update_validation(current_user=current_user, user_id=user.id)
+        user_delete_validation(current_user=current_user, user_id=user.id)
         if user is not None:
             query = users.delete().where(users.c.id == id)
             await self.database.execute(query)
