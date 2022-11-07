@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, Integer, String, Boolean, ForeignKey, Table
+from sqlalchemy import Column, DateTime, Integer, String, Boolean, ForeignKey, Table, ARRAY
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -61,6 +61,33 @@ class DbCompany(Base):
     description = Column(String, nullable=False)
     is_hide = Column(Boolean, nullable=False)
     owner = Column(String, ForeignKey('users.email'))
+    quizzes = relationship('DbQuestion')
 
 
 companies = DbCompany.__table__
+
+
+class DbQuiz(Base):
+    __tablename__ = 'quizzes'
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False, unique=True)
+    description = Column(String, nullable=False)
+    frequency = Column(Integer, nullable=False)
+    questions = relationship('DbQuestion', back_populates='question')
+    company_id = Column(Integer, ForeignKey('companies.id'))
+
+
+quizzes = DbQuiz.__table__
+
+
+class DbQuestion(Base):
+    __tablename__ = 'questions'
+    id = Column(Integer, primary_key=True, index=True)
+    question = Column(String, nullable=False)
+    options = Column(ARRAY(String), nullable=False)
+    answer = Column(String, nullable=False)
+    quiz_id = Column(Integer, ForeignKey('quizzes.id'))
+    question = relationship('DbQuiz', back_populates='questions')
+
+
+questions = DbQuestion.__table__

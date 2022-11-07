@@ -1,4 +1,6 @@
 import datetime
+from typing import List
+
 from pydantic import BaseModel, EmailStr
 import os
 
@@ -82,3 +84,41 @@ class Company(CompanyUpdate):
 class AllInvitesSchema(BaseModel):
     user_id: int
     company_id: int
+
+
+class Quiz(BaseModel):
+    name: str
+    description: str
+    frequency: int
+    company_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class DisplayQuiz(Quiz):
+    id: int
+
+
+class Question(BaseModel):
+    question: str
+    options: List[str]
+    answer: str
+    quiz_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class DisplayQuestion(Question):
+    id: int
+
+
+class DisplayQuestionWithId(BaseModel):
+    id: int
+    options: List[str]
+    answer: str
+    quiz_id: int
+
+    class Config:
+        orm_mode = True
