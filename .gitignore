@@ -135,3 +135,5 @@ tutorial.md
 /app/__pycache__/
 
 /app/.config
+
+/alembic/versions/old

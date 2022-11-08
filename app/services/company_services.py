@@ -23,7 +23,7 @@ class CompanyCRUD:
         )
 
         record_id = await self.database.execute(query)
-        query = companies.select().where(companies.c.id == record_id)
+        query = await self.database.fetch_one(companies.select().where(companies.c.id == record_id))
         row = await self.database.fetch_one(query)
 
         return Company(**row)
@@ -73,9 +73,9 @@ class CompanyCRUD:
         if company is not None:
             query = companies.delete().where(companies.c.id == id)
             await self.database.execute(query)
-            raise HTTPException(status_code=status.HTTP_200_OK, detail=f'User {id} deleted successfully')
+            raise HTTPException(status_code=status.HTTP_200_OK, detail=f'Company {id} deleted successfully')
         else:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id {id} not found')
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Company with id {id} not found')
 
     async def invite_user_to_company(self, company_id: int, user_id: int, current_user: UserDisplayWithId) \
             -> HTTPExceptionSchema:

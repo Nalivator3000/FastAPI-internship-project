@@ -25,7 +25,7 @@ async def get_company_by_id(id: int, response: Response, current_user=Depends(ge
 
 @router.get('/', response_model=List[Company], status_code=status.HTTP_200_OK)
 async def get_all_companies(response: Response, current_user=Depends(get_current_user)) -> list[Company]:
-    return await company_services.CompanyCRUD().get_all_companies()
+    return await company_services.CompanyCRUD().get_all_companies(response=response)
 
 
 @router.put('/{id}/', response_model=CompanyUpdate)
