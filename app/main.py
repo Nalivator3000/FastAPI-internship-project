@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI
 from dotenv import load_dotenv
 from base.base import database
-from routers import user, company, quizzes, questions
+from routers import user, company, quizzes, questions, result
 from auth import authentication
 
 load_dotenv("../.env")
@@ -14,6 +14,7 @@ app.include_router(authentication.router)
 app.include_router(company.router)
 app.include_router(quizzes.router)
 app.include_router(questions.router)
+app.include_router(result.router)
 
 
 @app.get('/')

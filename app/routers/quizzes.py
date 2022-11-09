@@ -2,10 +2,9 @@ from typing import List
 
 from fastapi import APIRouter, status, Depends, Response
 
-from base.schemas import Quiz, HTTPExceptionSchema, DisplayQuiz
+from base.schemas import Quiz, HTTPExceptionSchema, DisplayQuiz, Result
 from services import quiz_services
 from services.auth_services import get_current_user
-from services.validation import take_quiz_validation
 
 router = APIRouter(
     prefix='/quiz',
@@ -36,6 +35,6 @@ async def get_company_quizzes(company_id: int, current_user=Depends(get_current_
     return await quiz_services.QuizCRUD().get_company_quizzes(cid=company_id)
 
 
-@router.get('/take/{quiz_id}', status_code=status.HTTP_200_OK)
-async def take_quiz(quiz_id: int, current_user=Depends(get_current_user)):
+@router.get('/take/{quiz_id}', response_model=Result, status_code=status.HTTP_200_OK)
+async def take_quiz(quiz_id: int, current_user=Depends(get_current_user)) -> Result:
     return await quiz_services.QuizCRUD().take_quiz(quiz_id=quiz_id, current_user=current_user)

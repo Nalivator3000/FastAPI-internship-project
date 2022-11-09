@@ -72,7 +72,7 @@ class QuizCRUD:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Company #{cid} not found')
         return await self.database.fetch_all(quizzes.select().where(quizzes.c.company_id == cid))
 
-    async def take_quiz(self, quiz_id: int, current_user: UserDisplayWithId):
+    async def take_quiz(self, quiz_id: int, current_user: UserDisplayWithId) -> Result:
         await take_quiz_validation(quiz_id=quiz_id, current_user=current_user)
         all_questions = await self.database.fetch_all(questions.select().where(questions.c.quiz_id == quiz_id))
         # answers = {}
