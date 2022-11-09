@@ -42,7 +42,7 @@ services:
     image: redis:latest
     container_name: redis_db
     ports:
-      - ${REDIS_PORT_EXTERNAL}:${REDIS_PORT}
+      - ${REDIS_PORT}:${REDIS_PORT}
     command: ["redis-server","--appendonly","yes"]
     volumes:
       - redis_data:/redis

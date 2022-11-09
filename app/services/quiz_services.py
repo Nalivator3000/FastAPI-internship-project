@@ -103,6 +103,4 @@ class QuizCRUD:
         record_id = await self.database.execute(query)
         row = await self.database.fetch_one(results.select().where(results.c.id == record_id))
 
-
         return Result(**row)
-
