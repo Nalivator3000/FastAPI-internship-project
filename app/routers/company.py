@@ -95,7 +95,7 @@ async def delete_admin_from_company(user_id: int, company_id: int, current_user=
 
 @router.get('/me/invites/', response_model=list[AllInvitesSchema])
 async def get_all_invites(response: Response, current_user=Depends(get_current_user)) -> list[AllInvitesSchema]:
-    return await company_services.CompanyCRUD().get_all_invites(current_user=current_user)
+    return await company_services.CompanyCRUD().get_all_invites(response=response, current_user=current_user)
 
 
 @router.get('/me/applications/', response_model=list[AllInvitesSchema])

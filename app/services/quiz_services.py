@@ -3,9 +3,10 @@ from typing import List
 from base.base import database
 from fastapi import Response, status, HTTPException
 
-from base.models import quizzes, companies
-from base.schemas import Quiz, UserDisplayWithId, HTTPExceptionSchema, DisplayQuiz
-from services.validation import owner_or_admin_validation
+from base.models import quizzes, companies, questions, results
+from base.redis import set_redis
+from base.schemas import Quiz, UserDisplayWithId, HTTPExceptionSchema, DisplayQuiz, Result
+from services.validation import owner_or_admin_validation, take_quiz_validation
 
 
 class QuizCRUD:
@@ -29,11 +30,6 @@ class QuizCRUD:
         row = await self.database.fetch_one(quizzes.select().where(quizzes.c.id == record_id))
 
         return Quiz(**row)
-
-    async def get_all_quizzes(self, cid: int, response: Response) -> List[DisplayQuiz]:
-        response.status_code = status.HTTP_200_OK
-        quizzes_list = await self.database.fetch_all(quizzes.select().where(quizzes.c.company_id == cid))
-        return quizzes_list
 
     async def update_quiz(
             self, id: int, quiz: Quiz, response: Response, current_user: UserDisplayWithId) \
@@ -73,3 +69,40 @@ class QuizCRUD:
         if not company:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Company #{cid} not found')
         return await self.database.fetch_all(quizzes.select().where(quizzes.c.company_id == cid))
+
+    async def take_quiz(self, quiz_id: int, current_user: UserDisplayWithId):
+        await take_quiz_validation(quiz_id=quiz_id, current_user=current_user)
+        all_questions = await self.database.fetch_all(questions.select().where(questions.c.quiz_id == quiz_id))
+        result = 0
+        for i in range(len(all_questions)):
+            print(f'Question #{i}: {all_questions[i].question}')
+            for j in range(len(all_questions[i].options)):
+                print(f'Option {j}: {all_questions[i].options[j]}')
+            print('Chose right option')
+            option_id = input()
+            if all_questions[i].options[int(option_id)] == all_questions[i].answer:
+                result += 1
+            question = await self.database.fetch_one(questions.select().
+                                                     where(questions.c.question == all_questions[i].question))
+            print(f'Question id for redis: {question.id}')
+            set_redis(
+                key=question.id, val=all_questions[i].options[int(option_id)], current_user=current_user
+            )
+        p = result/len(all_questions)*100
+
+        quiz = await self.database.fetch_one(quizzes.select().where(quizzes.c.id == quiz_id))
+        query = results.insert().values(
+            user_id=current_user.id,
+            company_id=quiz.company_id,
+            quiz_id=quiz.id,
+            questions=len(all_questions),
+            right_answers=result
+        )
+
+        print(f'Your result is {result}/{len(all_questions)} or {"%.2f" % p}%')
+        record_id = await self.database.execute(query)
+        row = await self.database.fetch_one(results.select().where(results.c.id == record_id))
+
+
+        return Result(**row)
+

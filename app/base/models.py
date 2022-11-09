@@ -33,6 +33,13 @@ applications = Table(
     Column('company_id', ForeignKey('companies.id'))
 )
 
+# question_quiz = Table(
+#     'question_quiz',
+#     Base.metadata,
+#     Column('quiz_id', ForeignKey('quizzes.id')),
+#     Column('question_id', ForeignKey('questions.id'))
+# )
+
 
 class DbUser(Base):
     __tablename__ = 'users'
@@ -73,7 +80,7 @@ class DbQuiz(Base):
     name = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=False)
     frequency = Column(Integer, nullable=False)
-    questions = relationship('DbQuestion', back_populates='question')
+    questions = relationship('DbQuestion', back_populates='question_quiz')
     company_id = Column(Integer, ForeignKey('companies.id'))
 
 
@@ -87,7 +94,21 @@ class DbQuestion(Base):
     options = Column(ARRAY(String), nullable=False)
     answer = Column(String, nullable=False)
     quiz_id = Column(Integer, ForeignKey('quizzes.id'))
-    question = relationship('DbQuiz', back_populates='questions')
+    question_quiz = relationship('DbQuiz', back_populates='questions')
 
 
 questions = DbQuestion.__table__
+
+
+class DbResult(Base):
+    __tablename__ = 'results'
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    company_id = Column(Integer, ForeignKey('companies.id'))
+    quiz_id = Column(Integer, ForeignKey('quizzes.id'))
+    questions = Column(Integer, nullable=False)
+    right_answers = Column(Integer, nullable=False)
+    time = Column(DateTime(timezone=True), server_default=func.now())
+
+
+results = DbResult.__table__

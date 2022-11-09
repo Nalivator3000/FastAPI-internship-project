@@ -122,3 +122,17 @@ class DisplayQuestionWithId(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class QuestionQuiz(BaseModel):
+    quiz_id: int
+    question_id: int
+
+
+class Result(BaseModel):
+    user_id: int
+    company_id: int
+    quiz_id: int
+    questions: int
+    right_answers: int
+    time: datetime.datetime

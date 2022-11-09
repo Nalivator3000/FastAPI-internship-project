@@ -45,8 +45,9 @@ Jinja2~=3.1.2
 setuptools~=58.1.0
 asyncpg
 psycopg2-binary
-passlib
+passlib~=1.7.4
 email-validator
 jose
-pyJWT
+pyJWT~=2.6.0
 bcrypt
+redis~=4.3.4

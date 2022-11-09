@@ -67,3 +67,21 @@ class QuestionCRUD:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Quiz #{quiz_id} not found')
         quest = await self.database.fetch_all(questions.select().where(questions.c.quiz_id == quiz_id))
         return quest
+
+    # async def add_question_to_quiz(self, quiz_id: int, question_id: int, current_user: UserDisplayWithId)\
+    #         -> QuestionQuiz:
+    #     question = await self.database.fetch_one(questions.select().where(questions.c.id == question_id))
+    #     if not question:
+    #         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Question #{question_id} not found')
+    #     quiz = await self.database.fetch_one(quizzes.select().where(quizzes.c.id == quiz_id))
+    #     if not quiz:
+    #         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Quiz #{quiz_id} not found')
+    #     company = await self.database.fetch_one(companies.select().where(companies.c.id == quiz.company_id))
+    #     await owner_or_admin_validation(company=company, current_user=current_user, quiz=quiz)
+    #     await self.database.execute(question_quiz.insert().values(quiz_id=quiz_id, question_id=question_id))
+    #     row = self.database.fetch_one(question_quiz.select().
+    #                                   where(question_quiz.c.quiz_id == quiz_id).
+    #                                   where(question_quiz.c.question_id == question_id)
+    #                                   )
+    #     return QuestionQuiz(**row)
+

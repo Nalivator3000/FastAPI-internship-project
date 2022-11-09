@@ -1,9 +1,8 @@
 from pydantic import EmailStr
 
 from base.base import database
-from base.models import companies_administrators
-from base.schemas import UserUpdateRequestModel, Company, UserDisplay, UserDisplayWithId, Quiz, DisplayQuestion, \
-    DisplayQuiz
+from base.models import companies_administrators, companies_users, companies, quizzes
+from base.schemas import UserUpdateRequestModel, Company, UserDisplay, UserDisplayWithId, Quiz
 from fastapi import HTTPException, status
 
 
@@ -55,3 +54,14 @@ async def owner_or_admin_validation(company: Company, quiz: Quiz, current_user: 
         if company.owner != current_user.email and is_admin is None:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail='Only company owners or administrators can create quizzes')
+
+
+async def take_quiz_validation(quiz_id: int, current_user: UserDisplayWithId):
+    quiz = await database.fetch_one(quizzes.select().where(quizzes.c.id == quiz_id))
+    company = await database.fetch_one(companies_users.select().
+                                       where(companies_users.c.user_id == current_user.id).
+                                       where(companies_users.c.company_id == quiz.company_id)
+                                       )
+    if not company:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail=f"You don't have access to compony #{company.id}")
