@@ -2,12 +2,19 @@ import redis
 from dotenv import load_dotenv
 import os
 
-from base.schemas import UserDisplayWithId
+from fastapi import HTTPException, status
+from redis.client import Redis
 
 load_dotenv()
 
 
-def set_redis(key: int, val: str, current_user: UserDisplayWithId):
-    redis_db = redis.Redis(host=os.getenv('REDIS_HOST'), port=os.getenv('REDIS_PORT'), db=current_user.id)
-    redis_db.set(key, val)
-    return print(f'Key: {key}, Value: {val}')
+def set_redis(key: int, val: str):
+    try:
+        redis_db = get_redis()
+        redis_db.set(key, val)
+    except:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The answer was not recorded")
+
+
+def get_redis() -> Redis:
+    return redis.from_url(os.getenv('REDIS_URL'))

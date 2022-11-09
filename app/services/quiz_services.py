@@ -1,3 +1,5 @@
+import datetime
+import random
 from typing import List
 
 from base.base import database
@@ -73,22 +75,18 @@ class QuizCRUD:
     async def take_quiz(self, quiz_id: int, current_user: UserDisplayWithId):
         await take_quiz_validation(quiz_id=quiz_id, current_user=current_user)
         all_questions = await self.database.fetch_all(questions.select().where(questions.c.quiz_id == quiz_id))
+        # answers = {}
         result = 0
         for i in range(len(all_questions)):
-            print(f'Question #{i}: {all_questions[i].question}')
-            for j in range(len(all_questions[i].options)):
-                print(f'Option {j}: {all_questions[i].options[j]}')
-            print('Chose right option')
-            option_id = input()
+            option_id = random.randint(0, len(all_questions[i].options)-1)
             if all_questions[i].options[int(option_id)] == all_questions[i].answer:
                 result += 1
             question = await self.database.fetch_one(questions.select().
                                                      where(questions.c.question == all_questions[i].question))
-            print(f'Question id for redis: {question.id}')
-            set_redis(
-                key=question.id, val=all_questions[i].options[int(option_id)], current_user=current_user
-            )
-        p = result/len(all_questions)*100
+            # answers[f'{all_questions[i].question}'] = f'{all_questions[i].options[option_id]}'
+            # print(answers)
+            set_redis(key=f'{quiz_id},{question.id},{current_user.id},{datetime.date.today()}',
+                      val=all_questions[i].options[int(option_id)])
 
         quiz = await self.database.fetch_one(quizzes.select().where(quizzes.c.id == quiz_id))
         query = results.insert().values(
@@ -99,8 +97,8 @@ class QuizCRUD:
             right_answers=result
         )
 
-        print(f'Your result is {result}/{len(all_questions)} or {"%.2f" % p}%')
         record_id = await self.database.execute(query)
         row = await self.database.fetch_one(results.select().where(results.c.id == record_id))
 
         return Result(**row)
+

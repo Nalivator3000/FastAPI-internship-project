@@ -1,5 +1,5 @@
 import datetime
-from typing import List
+from typing import List, Dict
 
 from pydantic import BaseModel, EmailStr
 import os
@@ -127,6 +127,13 @@ class DisplayQuestionWithId(BaseModel):
 class QuestionQuiz(BaseModel):
     quiz_id: int
     question_id: int
+
+
+class Answer(BaseModel):
+    user_id: int
+    company_id: int
+    quiz_id: int
+    answers: Dict[str, str]
 
 
 class Result(BaseModel):
