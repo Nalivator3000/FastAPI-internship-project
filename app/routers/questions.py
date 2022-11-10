@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, status, Response, Depends
 
-from base.schemas import Question, HTTPExceptionSchema, DisplayQuestion, DisplayQuestionWithId
+from base.schemas import Question, HTTPExceptionSchema, DisplayQuestion, DisplayQuestionWithId, QuestionQuiz
 from services import question_services
 from services.auth_services import get_current_user
 
@@ -13,7 +13,7 @@ router = APIRouter(
 
 
 @router.post('/create/', response_model=Question, status_code=status.HTTP_201_CREATED)
-async def create_quiz(question: Question, response: Response, current_user=Depends(get_current_user)) -> Question:
+async def create_question(question: Question, response: Response, current_user=Depends(get_current_user)) -> Question:
     return await question_services.QuestionCRUD().create_question(
         question=question, response=response, current_user=current_user)
 

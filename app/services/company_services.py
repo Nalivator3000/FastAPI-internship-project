@@ -23,8 +23,7 @@ class CompanyCRUD:
         )
 
         record_id = await self.database.execute(query)
-        query = await self.database.fetch_one(companies.select().where(companies.c.id == record_id))
-        row = await self.database.fetch_one(query)
+        row = await self.database.fetch_one(companies.select().where(companies.c.id == record_id))
 
         return Company(**row)
 
@@ -69,13 +68,13 @@ class CompanyCRUD:
 
     async def delete_company(self, id: int, current_user: UserDisplayWithId) -> HTTPExceptionSchema:
         company = await self.database.fetch_one(companies.select().where(companies.c.id == id))
-        company_delete_validation(current_user=current_user, user_email=company.owner)
-        if company is not None:
+        if company is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Company with id {id} not found')
+        else:
+            company_delete_validation(current_user=current_user, user_email=company.owner)
             query = companies.delete().where(companies.c.id == id)
             await self.database.execute(query)
             raise HTTPException(status_code=status.HTTP_200_OK, detail=f'Company {id} deleted successfully')
-        else:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Company with id {id} not found')
 
     async def invite_user_to_company(self, company_id: int, user_id: int, current_user: UserDisplayWithId) \
             -> HTTPExceptionSchema:
