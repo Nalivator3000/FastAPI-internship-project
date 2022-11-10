@@ -33,13 +33,6 @@ applications = Table(
     Column('company_id', ForeignKey('companies.id'))
 )
 
-# question_quiz = Table(
-#     'question_quiz',
-#     Base.metadata,
-#     Column('quiz_id', ForeignKey('quizzes.id')),
-#     Column('question_id', ForeignKey('questions.id'))
-# )
-
 
 class DbUser(Base):
     __tablename__ = 'users'

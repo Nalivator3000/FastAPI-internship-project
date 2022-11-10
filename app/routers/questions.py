@@ -37,11 +37,3 @@ async def get_question_by_id(id: int, current_user=Depends(get_current_user)) ->
 @router.get('/quiz/{quiz_id}', status_code=status.HTTP_200_OK, response_model=List[DisplayQuestionWithId])
 async def get_quiz_questions(quiz_id: int, current_user=Depends(get_current_user)) -> List[DisplayQuestionWithId]:
     return await question_services.QuestionCRUD().get_quiz_questions(quiz_id=quiz_id)
-
-
-# @router.post('/{quiz_id}/{question_id}', status_code=status.HTTP_201_CREATED, response_model=QuestionQuiz)
-# async def add_question_to_quiz(quiz_id: int, question_id: int, current_user=Depends(get_current_user))\
-# -> QuestionQuiz:
-#     return await question_services.QuestionCRUD().add_question_to_quiz(
-#         quiz_id=quiz_id, question_id=question_id, current_user=current_user
-#     )

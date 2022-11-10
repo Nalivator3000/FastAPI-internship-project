@@ -75,7 +75,6 @@ class QuizCRUD:
     async def take_quiz(self, quiz_id: int, current_user: UserDisplayWithId) -> Result:
         await take_quiz_validation(quiz_id=quiz_id, current_user=current_user)
         all_questions = await self.database.fetch_all(questions.select().where(questions.c.quiz_id == quiz_id))
-        # answers = {}
         result = 0
         for i in range(len(all_questions)):
             option_id = random.randint(0, len(all_questions[i].options)-1)
@@ -83,8 +82,6 @@ class QuizCRUD:
                 result += 1
             question = await self.database.fetch_one(questions.select().
                                                      where(questions.c.question == all_questions[i].question))
-            # answers[f'{all_questions[i].question}'] = f'{all_questions[i].options[option_id]}'
-            # print(answers)
             set_redis(key=f'{quiz_id},{question.id},{current_user.id},{datetime.date.today()}',
                       val=all_questions[i].options[int(option_id)])
 
