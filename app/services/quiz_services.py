@@ -116,7 +116,7 @@ class QuizCRUD:
                             status_code=status.HTTP_200_OK,
                             media_type="text/csv")
 
-    async def get_answers_by_company(self, cid: int, current_user: UserDisplayWithId, uid: int = None):
+    async def get_answers_by_company(self, cid: int, current_user: UserDisplayWithId, uid: int = None) -> str:
         company = await self.database.fetch_one(companies.select().where(companies.c.id == cid))
         await owner_or_admin_validation(current_user=current_user, company=company)
         quiz_list = await self.get_company_quizzes(cid=cid)

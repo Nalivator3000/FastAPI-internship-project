@@ -47,10 +47,10 @@ async def get_answers_by_quiz_id(quiz_id: int, current_user=Depends(get_current_
 
 
 @router.get('/answers/{company_id}', status_code=status.HTTP_200_OK)
-async def get_answers_by_company(company_id: int, user_id: int = None, current_user=Depends(get_current_user)):
+async def get_answers_by_company(company_id: int, user_id: int = None, current_user=Depends(get_current_user)) -> str:
     return await quiz_services.QuizCRUD().get_answers_by_company(cid=company_id, current_user=current_user, uid=user_id)
 
 
 @router.get('/answers/{user_id}/{quiz_id}/', status_code=status.HTTP_200_OK)
-async def get_quiz_answers(user_id: int, quiz_id: int, current_user=Depends(get_current_user)):
+async def get_quiz_answers(user_id: int, quiz_id: int, current_user=Depends(get_current_user)) -> str:
     return await quiz_services.QuizCRUD().get_quiz_answers(user_id=user_id, quiz_id=quiz_id, current_user=current_user)
