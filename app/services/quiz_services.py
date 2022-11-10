@@ -1,3 +1,4 @@
+import csv
 import datetime
 import random
 from typing import List
@@ -6,9 +7,10 @@ from base.base import database
 from fastapi import Response, status, HTTPException
 
 from base.models import quizzes, companies, questions, results
-from base.redis import set_redis
+from base.redis import set_redis, find_records
 from base.schemas import Quiz, UserDisplayWithId, HTTPExceptionSchema, DisplayQuiz, Result
 from services.validation import owner_or_admin_validation, take_quiz_validation
+
 
 
 class QuizCRUD:
@@ -82,8 +84,8 @@ class QuizCRUD:
                 result += 1
             question = await self.database.fetch_one(questions.select().
                                                      where(questions.c.question == all_questions[i].question))
-            set_redis(key=f'{quiz_id},{question.id},{current_user.id},{datetime.date.today()}',
-                      val=all_questions[i].options[int(option_id)])
+            set_redis(key=f'{current_user.id}--{quiz_id}--{question.id}--{datetime.date.today()}',
+                      val=str(all_questions[i].options[int(option_id)]))
 
         quiz = await self.database.fetch_one(quizzes.select().where(quizzes.c.id == quiz_id))
         query = results.insert().values(
@@ -99,3 +101,40 @@ class QuizCRUD:
 
         return Result(**row)
 
+    async def get_answers_by_quiz_id(self, quiz_id: int, current_user: UserDisplayWithId) -> str:
+        records = find_records(quiz_id=quiz_id, user_id=int(current_user.id))
+        print(records)
+        my_dict = {}
+        for i in range(len(records)):
+            record = records[i].split('--')
+            print(record)
+            question = await self.database.fetch_one(questions.select().where(questions.c.id == int(record[2])))
+            my_dict.update({question.question: record[-1]})
+        print(my_dict)
+        with open(f'{current_user.id}_{quiz_id}_report.csv', 'w') as f:
+            w = csv.DictWriter(f, my_dict.keys())
+            w.writeheader()
+            w.writerow(my_dict)
+        return f'{current_user.id}_{quiz_id}_report.csv was created'
+
+    async def get_answers_by_company(self, cid: int, uid: int = None):
+        quiz_list = await self.get_company_quizzes(cid=cid)
+        quiz_id_list = []
+        for i in range(len(quiz_list)):
+            quiz_id_list.append(quiz_list[i].id)
+        if uid is not None:
+            my_dict = {}
+            for i in range(len(quiz_id_list)):
+                records = find_records(quiz_id=quiz_id_list[i], user_id=uid)
+                for j in range(len(records)):
+                    record = records[j].split('--')
+                    print(record)
+                    question = await self.database.fetch_one(questions.select().where(questions.c.id == int(record[2])))
+                    my_dict.update({question.question: record[-1]})
+            with open(f'User{cid}_Company{cid}_report.csv', 'w') as f:
+                w = csv.DictWriter(f, my_dict.keys())
+                w.writeheader()
+                w.writerow(my_dict)
+            return f'User{uid}_Company{cid}_report.csv was created'
+        else:
+            pass

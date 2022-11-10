@@ -38,3 +38,13 @@ async def get_company_quizzes(company_id: int, current_user=Depends(get_current_
 @router.get('/take/{quiz_id}', response_model=Result, status_code=status.HTTP_200_OK)
 async def take_quiz(quiz_id: int, current_user=Depends(get_current_user)) -> Result:
     return await quiz_services.QuizCRUD().take_quiz(quiz_id=quiz_id, current_user=current_user)
+
+
+@router.get('/answers/{quiz_id}', response_model=str, status_code=status.HTTP_200_OK)
+async def get_answers_by_quiz_id(quiz_id: int, current_user=Depends(get_current_user)) -> str:
+    return await quiz_services.QuizCRUD().get_answers_by_quiz_id(quiz_id=quiz_id, current_user=current_user)
+
+
+@router.get('answers/{company_id}')
+async def get_answers_by_company(company_id: int, user_id: int = None, current_user=Depends(get_current_user)):
+    return await quiz_services.QuizCRUD().get_answers_by_company(cid=company_id, uid=user_id)
