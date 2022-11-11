@@ -136,20 +136,18 @@ class Answer(BaseModel):
     answers: Dict[str, str]
 
 
-# class Result(BaseModel):
-#     user_id: int
-#     company_id: int
-#     quiz_id: int
-#     questions: int
-#     right_answers: int
-#     time: datetime.datetime
-
-
-class QuizAnswers(BaseModel):
+class DisplayAnswers(BaseModel):
     user_id: int
     company_id: int
     quiz_id: int
-    answers: Dict[str, str] = None
     questions: int
     right_answers: int
     time: datetime.datetime
+
+
+class DisplayAnswersWithId(DisplayAnswers):
+    id: int
+
+
+class QuizAnswers(DisplayAnswers):
+    answers: Dict[str, str] = None
