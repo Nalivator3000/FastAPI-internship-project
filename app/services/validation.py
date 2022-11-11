@@ -1,7 +1,7 @@
 from pydantic import EmailStr
 
 from base.base import database
-from base.models import companies_administrators, companies_users, companies, quizzes
+from base.models import companies_administrators, companies_users, quizzes
 from base.schemas import UserUpdateRequestModel, Company, UserDisplay, UserDisplayWithId, Quiz
 from fastapi import HTTPException, status
 

@@ -16,7 +16,7 @@ def set_redis(key: str, val: str):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The answer was not recorded")
 
 
-def get_redis(key: str):
+def get_redis(key: str) -> str:
     try:
         redis_db = redis_url()
         return redis_db.get(key)
@@ -40,7 +40,7 @@ def mget_redis(quiz_result: dict):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The answer was not recorded")
 
 
-def find_records(quiz_id: int, user_id: int = None):
+def find_records(quiz_id: int, user_id: int = None) -> list:
     redis_db = redis_url()
     records = []
     if user_id is not None:
@@ -57,7 +57,6 @@ def find_records(quiz_id: int, user_id: int = None):
             answer = str(get_redis(record))
             full_record = f'{record}--{answer[2:-1]}'
             records.append(full_record)
-    print(records)
     return records
 
 
