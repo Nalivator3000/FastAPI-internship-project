@@ -1,0 +1,65 @@
+version: "3.10"
+
+services:
+
+  db:
+    container_name: postgresql_db
+    image: postgres
+    restart: always
+    ports:
+      - ${POSTGRES_PORTS}
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - postgres_data:/postgres
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    ports:
+      - ${PG_ADMIN_PORTS}
+    depends_on:
+      - db
+
+#  app:
+#    container_name: app
+#    build: .
+#    command: bash -c "alembic upgrade head && uvicorn app.main:app --host ${APP_HOST} --port ${APP_PORT} --reload"
+#    volumes:
+#      - app_data:/app
+#    ports:
+#      - ${APP_PORTS}
+#    depends_on:
+#      - db
+#    restart: always
+
+  redis:
+    image: redis:latest
+    container_name: redis_db
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    command: ["redis-server","--appendonly","yes"]
+    volumes:
+      - redis_data:/redis
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: redis_ui
+    environment:
+      - REDIS_HOSTS=${REDIS_HOST}:redis:${REDIS_PORT}
+      - HTTP_USER=${REDIS_COMMANDER_USER}
+      - HTTP_PASSWORD=${REDIS_COMMANDER_PASSWORD}
+    ports:
+      - ${REDIS_COMMANDER_PORT}:${REDIS_COMMANDER_PORT}
+    depends_on:
+      - redis
+
+volumes:
+  postgres_data:
+  redis_data:
+#  app_data:
